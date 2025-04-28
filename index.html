@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stable Diffusion Demo with Loading</title>
+</head>
+<body>
+  <h1>Stable Diffusion (Pollinations.ai)</h1>
+  <input id="prompt" type="text" placeholder="Prompt goes here" />
+  <button id="generate">Generate Image</button>
+  <p id="loading" style="display: none;">Please wait while the AI generates the image…</p>
+  <div>
+    <h2>Output:</h2>
+    <img id="output" alt="Generated image will appear here" />
+  </div>
+
+  <script>
+    const btn = document.getElementById('generate');
+    const input = document.getElementById('prompt');
+    const loading = document.getElementById('loading');
+    const output = document.getElementById('output');
+
+    btn.addEventListener('click', async () => {
+      const prompt = input.value.trim();
+      if (!prompt) {
+        alert('Please enter a prompt.');
+        return;
+      }
+
+      // Show loading message
+      loading.style.display = 'block';
+      output.src = '';            // clear previous image
+      btn.disabled = true;        // prevent repeated clicks
+
+      const url = 'https://image.pollinations.ai/prompt/' + encodeURIComponent(prompt);
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          throw new Error('HTTP ' + res.status);
+        }
+        const blob = await res.blob();
+        output.src = URL.createObjectURL(blob);
+      } catch (err) {
+        console.error(err);
+        alert('Generation failed: ' + err.message);
+      } finally {
+        // Hide loading and re-enable button
+        loading.style.display = 'none';
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
